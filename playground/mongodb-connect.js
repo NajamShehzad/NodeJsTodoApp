@@ -1,8 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
-var uri = "mongodb://mydatabase:lai9024lv@ds139082.mlab.com:39082/mydatabase";
-var uri2 = "mongodb+srv://database:lai9024lv@olxpakistan-xftkm.mongodb.net/test?retryWrites=true"
 
-MongoClient.connect(uri, (err, db) => {
+MongoClient.connect(process.env.databaseUri, (err, db) => {
     if (err) {
         return console.log('Unable To Connect to MongoDb');
     }

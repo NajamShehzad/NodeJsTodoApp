@@ -1,7 +1,6 @@
 const {MongoClient,ObjectID} = require('mongodb');
-var uri = "mongodb://mydatabase:lai9024lv@ds139082.mlab.com:39082/mydatabase";
 
-MongoClient.connect(uri, (err, db) => {
+MongoClient.connect(process.env.databaseUri, (err, db) => {
     if (err) {
         return console.log('Unable To Connect to MongoDb');
     }
