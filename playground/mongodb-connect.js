@@ -1,6 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
+var uri = "mongodb://mydatabase:lai9024lv@ds139082.mlab.com:39082/mydatabase";
+var uri2 = "mongodb+srv://database:lai9024lv@olxpakistan-xftkm.mongodb.net/test?retryWrites=true"
 
-MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
+MongoClient.connect(uri, (err, db) => {
     if (err) {
         return console.log('Unable To Connect to MongoDb');
     }
@@ -17,9 +19,9 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
         
     // })
     db.collection('Users').insertOne({
-        name:'Najam Shehzad',
-        age:{next:21},
-        location:'PK'
+        name:'Najam Shehzad Butt',
+        age:22,
+        location:'UK'
     },(err,result) => {
         if(err){
            return console.log('Something Went Wrong');

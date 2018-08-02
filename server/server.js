@@ -6,7 +6,10 @@ var { Todo } = require('./db/models/Todo');
 var { Users } = require('./db/models/User');
 var app = express();
 
+const port = process.env.PORT || 8000;
+
 app.use(bodyParser.json());
+
 
 
 app.post('/todos', (req, res) => {
@@ -37,14 +40,14 @@ app.get('/todos', (req, res) => {
 app.get('/todos/:id', (req, res) => {
     var id = req.params.id;
     console.log(id);
-    if(!ObjectID.isValid(id)){
+    if (!ObjectID.isValid(id)) {
         return res.status(404).send("id is Not Valid");
     }
     Todo.findById(id).then((todo) => {
         if (!todo) {
             return res.status(404).send("id Not Found");
         }
-        res.send({todo});
+        res.send({ todo });
     }, err => {
         res.status(400).send([]);
     })
@@ -52,6 +55,6 @@ app.get('/todos/:id', (req, res) => {
 });
 
 
-app.listen(8000, () => {
-    console.log('Listing Port 8000');
+app.listen(port, () => {
+    console.log(`Listing Port ${port}`);
 })
