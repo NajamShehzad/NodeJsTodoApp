@@ -8,7 +8,7 @@ var app = express();
 app.use(bodyParser.json());
 
 
-app.post('/post', (req, res) => {
+app.post('/todos', (req, res) => {
     var body = req.body;
     console.log(body);
 
@@ -26,7 +26,13 @@ app.post('/post', (req, res) => {
 });
 
 
-
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        res.send({ todos })
+    }, err => {
+        res.send(err);
+    })
+});
 
 
 app.listen(8000, () => {
