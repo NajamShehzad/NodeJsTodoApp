@@ -1,5 +1,6 @@
 const express = require('express');
 const _ = require('lodash');
+const { SHA256 } = require('crypto-js');
 const { ObjectID } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
@@ -102,19 +103,12 @@ app.patch('/todos/:id', (req, res) => {
 //NOW For Users
 app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
-    console.log(body);
     var user = new Users(body);
-    //password encryption
-    
-    if (user.isModified('password')) {
-        console.log('im here')
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(body.password, salt, (err, hash) => {
-                body.password = hash;
-            });
-        });
-    } 
-    //saving in database
+    console.log('im here')
+    body.password = SHA256(JSON.stringify(body.password) + 'someword').toString();
+
+    console.log(body);
+
     user.save().then(result => {
         if (!result) {
             return res.status(404).send('Some Went wrong')
