@@ -4,6 +4,7 @@ const { ObjectID } = require('mongodb');
 const bodyParser = require('body-parser');
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./db/models/Todo');
+const jwt = require('jsonwebtoken');
 var { Users } = require('./db/models/User');
 var app = express();
 
@@ -12,7 +13,7 @@ const port = process.env.PORT || 8000;
 app.use(bodyParser.json());
 
 
-
+//For Todos
 app.post('/todos', (req, res) => {
     var body = req.body;
     console.log(body);
@@ -29,8 +30,6 @@ app.post('/todos', (req, res) => {
 
     });
 });
-
-
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
         res.send({ todos })
@@ -77,7 +76,7 @@ app.patch('/todos/:id', (req, res) => {
     var id = req.params.id;
     console.log(id);
     var body = _.pick(req.body, ['text', 'completed']);
-    
+
     if (!ObjectID.isValid(id)) {
         return res.status(404).send('Invalid id');
     }
@@ -88,7 +87,7 @@ app.patch('/todos/:id', (req, res) => {
         body.completed = false;
     }
     console.log(body);
-    Todo.findByIdAndUpdate(id, { $set: body},{new:true}).then((todo) => {
+    Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         }
@@ -98,6 +97,39 @@ app.patch('/todos/:id', (req, res) => {
     })
 
 });
+//NOW For Users
+app.post('/users', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    console.log(body);
+    var user = new Users(body);
+    user.save().then(result => {
+        if (!result) {
+            return res.status(404).send('Some Went wrong')
+        }
+        //now pushing token in user body
+        var access = 'auth';
+        var token = jwt.sign({_id: result._id.toHexString(), access }, 'abc123').toString();
+        body.tokens = [];
+        body.tokens.push({ access, token });
+        body._id = result._id
+        //updating user body
+        Users.findByIdAndUpdate(body._id, { $set: body }, { new: true }).then((result) => {
+            if (!result) {
+                return res.status(404).send();
+            }
+            var dataToSend = _.pick(result,['email','_id']);
+            res.header('x-auth', token).send(dataToSend);
+        }, err => {
+            res.status(404).send();
+        })
+    }).catch(err => {
+        res.status(404).send(err);
+    })
+});
+
+
+
+
 
 app.listen(port, () => {
     console.log(`Listing Port ${port}`);
