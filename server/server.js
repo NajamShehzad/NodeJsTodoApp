@@ -6,6 +6,7 @@ var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./db/models/Todo');
 const jwt = require('jsonwebtoken');
 var { Users } = require('./db/models/User');
+var {authenticate} = require('./middleware/authenticate');
 var app = express();
 
 const port = process.env.PORT || 8000;
@@ -108,7 +109,7 @@ app.post('/users', (req, res) => {
         }
         //now pushing token in user body
         var access = 'auth';
-        var token = jwt.sign({_id: result._id.toHexString(), access }, 'abc123').toString();
+        var token = jwt.sign({ _id: result._id.toHexString(), access }, 'abc123').toString();
         body.tokens = [];
         body.tokens.push({ access, token });
         body._id = result._id
@@ -117,7 +118,7 @@ app.post('/users', (req, res) => {
             if (!result) {
                 return res.status(404).send();
             }
-            var dataToSend = _.pick(result,['email','_id']);
+            var dataToSend = _.pick(result, ['email', '_id']);
             res.header('x-auth', token).send(dataToSend);
         }, err => {
             res.status(404).send();
@@ -125,6 +126,11 @@ app.post('/users', (req, res) => {
     }).catch(err => {
         res.status(404).send(err);
     })
+});
+app.get('/users/me',authenticate, (req, res) => {
+    console.log('working');
+    res.send(req.user);
+    // res.send('hi there')
 });
 
 
