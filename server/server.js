@@ -105,7 +105,7 @@ app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
     var user = new Users(body);
     console.log('im here')
-    body.password = SHA256(JSON.stringify(body.password) + 'someword').toString();
+    body.password = SHA256(JSON.stringify(body.password) + '@#someword').toString();
 
     console.log(body);
 
@@ -137,6 +137,39 @@ app.get('/users/me', authenticate, (req, res) => {
     console.log('working');
     res.send(req.user);
     // res.send('hi there')
+});
+
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    // console.log(body);
+    Users.findOne({ email: body.email }).then(result => {
+        if (!result) {
+            return res.status(401).send();
+        }
+        var reqPass = SHA256(JSON.stringify(body.password) + '@#someword').toString();
+        var userPass = result.password;
+        if (reqPass !== userPass) {
+            console.log("Something is Wrong");
+            return res.status(401).send();
+        }
+        var access = 'auth';
+        var token = jwt.sign({ _id: result._id.toHexString(), access }, 'abc123').toString();
+        body = result
+        body.tokens.push({ access, token });
+        
+        // updating user body
+        Users.findByIdAndUpdate(body._id, { $set: body }, { new: true }).then((result) => {
+            if (!result) {
+                return res.status(404).send();
+            }
+            res.header('x-auth', token).send(result);
+        }, err => {
+            res.status(404).send();
+        });
+    }).catch(err => {
+        res.status(401).send(err);
+
+    });
 });
 
 
