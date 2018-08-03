@@ -1,12 +1,13 @@
 const express = require('express');
 const _ = require('lodash');
 const { ObjectID } = require('mongodb');
+const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./db/models/Todo');
 const jwt = require('jsonwebtoken');
 var { Users } = require('./db/models/User');
-var {authenticate} = require('./middleware/authenticate');
+var { authenticate } = require('./middleware/authenticate');
 var app = express();
 
 const port = process.env.PORT || 8000;
@@ -103,6 +104,17 @@ app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
     console.log(body);
     var user = new Users(body);
+    //password encryption
+    
+    if (user.isModified('password')) {
+        console.log('im here')
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(body.password, salt, (err, hash) => {
+                body.password = hash;
+            });
+        });
+    } 
+    //saving in database
     user.save().then(result => {
         if (!result) {
             return res.status(404).send('Some Went wrong')
@@ -127,7 +139,7 @@ app.post('/users', (req, res) => {
         res.status(404).send(err);
     })
 });
-app.get('/users/me',authenticate, (req, res) => {
+app.get('/users/me', authenticate, (req, res) => {
     console.log('working');
     res.send(req.user);
     // res.send('hi there')

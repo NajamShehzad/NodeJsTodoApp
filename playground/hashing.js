@@ -1,14 +1,22 @@
-const {SHA256} = require('crypto-js');
+const { SHA256 } = require('crypto-js');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-var data ={
-    id:4
-}
+var password = "najam1234";
 
+// bcrypt.genSalt(10, (err, salt) => {
+//     bcrypt.hash(password, salt, (err, hash) => {
+//         console.log(hash);
+//     });
+// });
+var hashedpass = "$2a$10$C1va78SYwVHCN.ZtqEpBc.CdH7.ZAItCwa5vY4cnObl8Q87VD7DcO";
 
-var token = jwt.sign(data,'t@24#nO%Las');
-// jwt.verify
-console.log(token);
+bcrypt.compare('najam1234', hashedpass, (err, res) => {
+    console.log(res);
+})
+// var token = jwt.sign(data,'t@24#nO%Las');
+// // jwt.verify
+// console.log(token);
 
 // var message =  'my name is najam 3';
 // var hash = SHA256(message).toString();
@@ -31,7 +39,7 @@ console.log(token);
 // }
 // else{
 //     console.log('Golamla hae bhai sb golmal hae');
-    
+
 // }
 
 
