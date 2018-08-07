@@ -16,12 +16,13 @@ const port = process.env.PORT || 8000;
 app.use(bodyParser.json());
 
 //For Todos
-app.post('/todos', (req, res) => {
+app.post('/todos',authenticate,(req, res) => {
     var body = req.body;
     console.log(body);
 
     var todo = new Todo({
         text: body.text,
+        createdBy:req.user._id
     });
     todo.save().then(doc => {
         console.log("Sucessfull :", doc);
