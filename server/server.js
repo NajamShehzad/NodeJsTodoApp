@@ -173,7 +173,7 @@ app.post('/users/login', (req, res) => {
 app.delete('/users/me/token',authenticate,(req,res) => {
     // console.log(req.user,req.token);
     req.user.removeToken(req.token).then(()=> {
-        res.status(200).send('Token Removed');
+        res.status(200).send('Token Removed'); 
     },() => {
         res.status(400).send();
     })
