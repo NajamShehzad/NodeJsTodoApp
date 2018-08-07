@@ -15,7 +15,6 @@ const port = process.env.PORT || 8000;
 
 app.use(bodyParser.json());
 
-
 //For Todos
 app.post('/todos', (req, res) => {
     var body = req.body;
@@ -156,7 +155,7 @@ app.post('/users/login', (req, res) => {
         var token = jwt.sign({ _id: result._id.toHexString(), access }, 'abc123').toString();
         body = result
         body.tokens.push({ access, token });
-        
+
         // updating user body
         Users.findByIdAndUpdate(body._id, { $set: body }, { new: true }).then((result) => {
             if (!result) {
@@ -171,7 +170,15 @@ app.post('/users/login', (req, res) => {
 
     });
 });
+app.delete('/users/me/token',authenticate,(req,res) => {
+    // console.log(req.user,req.token);
+    req.user.removeToken(req.token).then(()=> {
+        res.status(200).send('Token Removed');
+    },() => {
+        res.status(400).send();
+    })
 
+});
 
 
 
