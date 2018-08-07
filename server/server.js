@@ -12,6 +12,8 @@ var { authenticate } = require('./middleware/authenticate');
 var app = express();
 
 const port = process.env.PORT || 8000;
+const tokenPass = process.env.tokenPass|| 'abc123';
+const hashPass = process.env.hashPass|| '@#someword';
 
 app.use(bodyParser.json());
 
@@ -117,7 +119,7 @@ app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
     var user = new Users(body);
     console.log('im here')
-    body.password = SHA256(JSON.stringify(body.password) + '@#someword').toString();
+    body.password = SHA256(JSON.stringify(body.password) + hashPass).toString();
 
     console.log(body);
 
@@ -127,7 +129,7 @@ app.post('/users', (req, res) => {
         }
         //now pushing token in user body
         var access = 'auth';
-        var token = jwt.sign({ _id: result._id.toHexString(), access }, 'abc123').toString();
+        var token = jwt.sign({ _id: result._id.toHexString(), access }, tokenPass).toString();
         body.tokens = [];
         body.tokens.push({ access, token });
         body._id = result._id
@@ -158,14 +160,14 @@ app.post('/users/login', (req, res) => {
         if (!result) {
             return res.status(401).send();
         }
-        var reqPass = SHA256(JSON.stringify(body.password) + '@#someword').toString();
+        var reqPass = SHA256(JSON.stringify(body.password) + hashPass).toString();
         var userPass = result.password;
         if (reqPass !== userPass) {
             console.log("Something is Wrong");
             return res.status(401).send();
         }
         var access = 'auth';
-        var token = jwt.sign({ _id: result._id.toHexString(), access }, 'abc123').toString();
+        var token = jwt.sign({ _id: result._id.toHexString(), access }, tokenPass).toString();
         body = result
         body.tokens.push({ access, token });
 
