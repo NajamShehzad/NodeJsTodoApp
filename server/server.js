@@ -33,8 +33,10 @@ app.post('/todos',authenticate,(req, res) => {
 
     });
 });
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos) => {
+app.get('/todos',authenticate,(req, res) => {
+    Todo.find({
+        createdBy:req.user._id
+    }).then((todos) => {
         res.send({ todos })
     }, err => {
         res.send(err);
