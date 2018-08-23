@@ -16,6 +16,13 @@ const tokenPass = process.env.tokenPass|| 'abc123';
 const hashPass = process.env.hashPass|| '@#someword';
 
 app.use(bodyParser.json());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "https://secret-lowlands-86691.herokuapp.com");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin,Content-Type, Authorization, x-id, Content-Length, X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    next();
+});
 
 //For Todos
 app.post('/todos',authenticate,(req, res) => {
