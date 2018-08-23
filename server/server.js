@@ -10,19 +10,14 @@ const jwt = require('jsonwebtoken');
 var { Users } = require('./db/models/User');
 var { authenticate } = require('./middleware/authenticate');
 var app = express();
+var cors = require('cors');
 
 const port = process.env.PORT || 8000;
 const tokenPass = process.env.tokenPass|| 'abc123';
 const hashPass = process.env.hashPass|| '@#someword';
 
 app.use(bodyParser.json());
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "https://secret-lowlands-86691.herokuapp.com");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Headers", "Origin,Content-Type, Authorization, x-id, Content-Length, X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    next();
-});
+app.use(cors());
 
 //For Todos
 app.post('/todos',authenticate,(req, res) => {
